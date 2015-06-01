@@ -1,16 +1,16 @@
-/*
- * Copyright 2010-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License").
- * You may not use this file except in compliance with the License.
- * A copy of the License is located at
- *
- *  http://aws.amazon.com/apache2.0
- *
- * or in the "license" file accompanying this file. This file is distributed
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied. See the License for the specific language governing
- * permissions and limitations under the License.
+/**
+ Copyright 2010-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+ Licensed under the Apache License, Version 2.0 (the "License").
+ You may not use this file except in compliance with the License.
+ A copy of the License is located at
+
+ http://aws.amazon.com/apache2.0
+
+ or in the "license" file accompanying this file. This file is distributed
+ on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ express or implied. See the License for the specific language governing
+ permissions and limitations under the License.
  */
 
 #import <Foundation/Foundation.h>
@@ -53,6 +53,20 @@ FOUNDATION_EXPORT NSString *const AWSDateShortDateFormat1;
 
 @end
 
+@interface NSJSONSerialization (AWS)
+
++ (NSData *)aws_dataWithJSONObject:(id)obj
+                           options:(NSJSONWritingOptions)opt
+                             error:(NSError **)error;
+
+@end
+
+@interface NSNumber (AWS)
+
++ (NSNumber *)aws_numberFromString:(NSString *)string;
+
+@end
+
 @interface NSObject (AWS)
 
 - (NSDictionary *)aws_properties;
@@ -65,10 +79,10 @@ FOUNDATION_EXPORT NSString *const AWSDateShortDateFormat1;
 
 @interface NSString (AWS)
 
-+ (NSString *)aws_randomStringWithLength:(NSUInteger)length;
 - (BOOL)aws_isBase64Data;
 - (NSString *)aws_stringWithURLEncoding;
 - (NSString *)aws_stringWithURLEncodingPath;
+- (NSString *)aws_stringWithURLEncodingPathWithoutPriorDecoding;
 - (NSString *)aws_md5String;
 
 @end

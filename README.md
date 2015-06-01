@@ -7,6 +7,7 @@
 
 ##Highlights
 
+* **AWS Lambda** - AWS Lambda is now included in the AWS Mobile SDK, making it easy to build mobile applications that use Lambda functions as their app backend. You can now create AWS Lambda functions that respond to events from your application in real time (synchronously) as well as asynchronously, making it easy for any application or web service to use Lambda to create back-end functionality. When invoked through the mobile SDK, the Lambda function automatically has access to data about the device, app, and end user identity, making it easy to create rich, personalized responses to in-app activity. To learn more about SDK support for Lambda, visit the [AWS Mobile SDK](http://aws.amazon.com/mobile/sdk/) page. To learn more about the new capabilities from Lambda, visit the [What's new](http://aws.amazon.com/lambda/whatsnew/) page for AWS Lambda.
 * **Amazon Cognito** – A simple user identity and synchronization service that helps you securely manage and synchronize app data for your users across their mobile devices. With Amazon Cognito, you can save any kind of data, such as app preferences or game state, in the AWS cloud without writing any backend code or managing any infrastructure.
 * **Amazon Mobile Analytics** – A service for collecting, visualizing, and understanding app usage data at scale. Amazon Mobile Analytics reports are typically updated within 60 minutes of data being received. Amazon Mobile Analytics is built to scale with the business and can collect and process billions of events from millions of endpoints.
 * **Amazon Kinesis Recorder** – Enables you to reliably record data to an Amazon Kinesis data stream from your mobile app. Kinesis Recorder batches requests to handle intermittent network connections, and it enables you to record events even when the device is offline.
@@ -15,7 +16,8 @@
 * **ARC support** - The AWS SDK for iOS is now ARC enabled from the ground up to improve overall memory management.
 * **BFTask support** - With native BFTask support in the AWS SDK for iOS, you can chain async requests instead of nesting them. This makes the logic cleaner while keeping the code more readable.
 * **Conforming Objective-C recommendations** - The AWS SDK for iOS conforms to Objective-C best practices. The SDK returns NSErrors instead of throwing exceptions. iOS developers will now feel at home when using the AWS Mobile SDK.
-* **Official CocoaPods support** - Including the AWS SDK for iOS in your project is now easier than ever. You just need to add `pod 'AWSiOSSDKv2'` and `pod 'AWSCognitoSync'` to your Podfile.
+* **Official CocoaPods support** - Including the AWS SDK for iOS in your project is now easier than ever. You just need to add `pod 'AWS<#ServiceName#>'` to your Podfile.
+* **Amazon Machine Learning** - Amazon Machine Learning is a service that makes it easy for developers of all skill levels to use machine learning technology. This release adds Amazon Machine Learning support into AWS Mobile SDK for iOS. You can use the mobile SDK to retrieve Amazon ML model metadata, including the real-time endpoint URL, and to request real-time predictions from Amazon ML. To learn more about Amazon ML, visit [http://aws.amazon.com/machine-learning](http://aws.amazon.com/machine-learning).
 
 ##Setting Up
 
@@ -39,12 +41,25 @@ The [sample apps](https://github.com/awslabs/aws-sdk-ios-samples) are standalone
 		$ sudo gem install cocoapods
 		$ pod setup
 
-1. In your project directory (the directory where your `*.xcodeproj` file is), create a plain text file named **Podfile** (without any file extension) and add the following lines. If you want to use [Amazon Cognito Sync](http://aws.amazon.com/cognito/), make sure to include `pod 'AWSCognitoSync'` as well.
+1. In your project directory (the directory where your `*.xcodeproj` file is), create a plain text file named **Podfile** (without any file extension) and add the following lines.
 
         source 'https://github.com/CocoaPods/Specs.git'
         
-        pod 'AWSiOSSDKv2'
-        pod 'AWSCognitoSync'
+        pod 'AWSCore'
+        pod 'AWSAutoScaling'
+        pod 'AWSCloudWatch'
+        pod 'AWSDynamoDB'
+        pod 'AWSEC2'
+        pod 'AWSElasticLoadBalancing'
+        pod 'AWSKinesis'
+        pod 'AWSLambda'
+        pod 'AWSMachineLearning'
+        pod 'AWSS3'
+        pod 'AWSSES'
+        pod 'AWSSimpleDB'
+        pod 'AWSSNS'
+        pod 'AWSSQS'
+        pod 'AWSCognito'
         
     ![image](readme-images/cocoapods-setup-01.png?raw=true)
         
@@ -85,7 +100,25 @@ The [sample apps](https://github.com/awslabs/aws-sdk-ios-samples) are standalone
 
 1. With your project open in Xcode, Control+click **Frameworks** and then click **Add files to "\<project name\>"...**.
 
-1. In Finder, navigate to the `AWSiOSSDKv2.framework` file and select it. Click **Add**. If you want to use [Amazon Cognito Sync](http://aws.amazon.com/cognito/), you also need to add the `AWSCognitoSync.framework`, which is in the **extras** directory.
+1. In Finder, navigate to the `AWS<#ServiceName#>.framework` files and select them.
+
+    * `AWSCore.framework`
+    * `AWSAutoScaling.framework`
+    * `AWSCloudWatch.framework`
+    * `AWSDynamoDB.framework`
+    * `AWSEC2.framework`
+    * `AWSElasticLoadBalancing.framework`
+    * `AWSKinesis.framework`
+    * `AWSLambda.framework`
+    * `AWSMachineLearning.framework`
+    * `AWSS3.framework`
+    * `AWSSES.framework`
+    * `AWSSimpleDB.framework`
+    * `AWSSNS.framework`
+    * `AWSSQS.framework`
+    * `extras/AWSCognito.framework` - for [Amazon Cognito Sync](http://aws.amazon.com/cognito/)
+
+1. Click **Add**.
 
 1. Following the same procedure, add the following frameworks, located in the **third-party** directory, into your project.
 
@@ -102,12 +135,14 @@ The [sample apps](https://github.com/awslabs/aws-sdk-ios-samples) are standalone
 
     * `autoscaling-2011-01-01.json`
     * `cognito-identity-2014-06-30.json`
-    * `css-2014-06-30.json`
+    * `cognito-sync-2014-06-30.json`
     * `dynamodb-2012-08-10.json`
     * `ec2-2014-06-15.json`
     * `elasticloadbalancing-2012-06-01.json`
     * `email-2010-12-01.json`
     * `kinesis-2013-12-02.json`
+    * `lambda-2015-03-31.json`
+    * `machinelearning-2014-12-12.json`
     * `mobileanalytics-2014-06-30.json`
     * `monitoring-2010-08-01.json`
     * `s3-2006-03-01.json`
@@ -136,9 +171,23 @@ When we release a new version of the SDK, you can pick up the changes as describ
 
 1. In Xcode select the following frameworks and hit **delete** on your keyboard. Then select **Move to Trash**:
 
-    * `AWSiOSSDKv2.framework`
-    * `AWSCognitoSync.framework`
+    * `AWSCore.framework`
+    * `AWSAutoScaling.framework`
+    * `AWSCloudWatch.framework`
+    * `AWSDynamoDB.framework`
+    * `AWSEC2.framework`
+    * `AWSElasticLoadBalancing.framework`
+    * `AWSKinesis.framework`
+    * `AWSLambda.framework`
+    * `AWSMachineLearning.framework`
+    * `AWSS3.framework`
+    * `AWSSES.framework`
+    * `AWSSimpleDB.framework`
+    * `AWSSNS.framework`
+    * `AWSSQS.framework`
+    * `AWSCognito.framework`
     * `Bolts.framework`
+    * `FMDB.framework`
     * `GZIP.framework`
     * `Mantle.framework`
     * `Reachability.framework`
@@ -150,12 +199,14 @@ When we release a new version of the SDK, you can pick up the changes as describ
 
     * `autoscaling-2011-01-01.json`
     * `cognito-identity-2014-06-30.json`
-    * `css-2014-06-30.json`
+    * `cognito-sync-2014-06-30.json`
     * `dynamodb-2012-08-10.json`
     * `ec2-2014-06-15.json`
     * `elasticloadbalancing-2012-06-01.json`
     * `email-2010-12-01.json`
     * `kinesis-2013-12-02.json`
+    * `lambda-2015-03-31.json`
+    * `machinelearning-2014-12-12.json`
     * `mobileanalytics-2014-06-30.json`
     * `monitoring-2010-08-01.json`
     * `s3-2006-03-01.json`
@@ -170,23 +221,14 @@ When we release a new version of the SDK, you can pick up the changes as describ
 
 1. Create an Objective-C bridging header file using Xcode.
 
-1. In the bridging header, import the appropriate headers for the services you are using. The header file import convention for CocoaPods is `#import "SERVICENAME.h"`, and for frameworks it is `#import <FRAMEWORKNAME/SERVICENAME.h>`, as in the following examples:
+1. In the bridging header, import the appropriate headers for the services you are using. The header file import convention is `#import <AWSServiceName/AWSServiceName.h>`, as in the following examples:
 
-    **CocoaPods**
-    
-        #import "AWSCore.h"
-        #import "S3.h"
-        #import "DynamoDB.h"
-        #import "SQS.h"
-        #import "SNS.h"
-
-    **Frameworks**
-    
-        #import <AWSiOSSDKv2/AWSCore.h>
-        #import <AWSiOSSDKv2/S3.h>
-        #import <AWSiOSSDKv2/DynamoDB.h>
-        #import <AWSiOSSDKv2/SQS.h>
-        #import <AWSiOSSDKv2/SNS.h>
+        #import <AWSCore/AWSCore.h>
+        #import <AWSS3/AWSS3.h>
+        #import <AWSDynamoDB/AWSDynamoDB.h>
+        #import <AWSSQS/AWSSQS.h>
+        #import <AWSSNS/AWSSNS.h>
+        #import <AWSCognito/AWSCognito.h>
 
     ![image](readme-images/objc-bridging-header-01.png?raw=true)
 
@@ -197,26 +239,17 @@ When we release a new version of the SDK, you can pick up the changes as describ
 
 1. Import the AWSCore header in the application delegate.
 
-    **CocoaPods**
-    
-        #import "AWSCore.h"
-
-    **Frameworks**
-    
-        #import <AWSiOSSDKv2/AWSCore.h>
+        #import <AWSCore/AWSCore.h>
 
 1. Create a default service configuration by adding the following code snippet in the `application:didFinishLaunchingWithOptions:` application delegate method.
 
-        let credentialsProvider = AWSCognitoCredentialsProvider.credentialsWithRegionType(
-            AWSRegionType.USEast1,
-            accountId: cognitoAccountId,
-            identityPoolId: cognitoIdentityPoolId,
-            unauthRoleArn: cognitoUnauthRoleArn,
-            authRoleArn: cognitoAuthRoleArn)
-        let defaultServiceConfiguration = AWSServiceConfiguration(
-            region: AWSRegionType.USEast1,
+        let credentialsProvider = AWSCognitoCredentialsProvider(
+            regionType: CognitoRegionType,
+            identityPoolId: CognitoIdentityPoolId)
+        let configuration = AWSServiceConfiguration(
+            region: DefaultServiceRegionType,
             credentialsProvider: credentialsProvider)
-        AWSServiceManager.defaultServiceManager().setDefaultServiceConfiguration(defaultServiceConfiguration)
+        AWSServiceManager.defaultServiceManager().defaultServiceConfiguration = configuration
 
 1. Make a call to the AWS services.
 
@@ -238,44 +271,28 @@ When we release a new version of the SDK, you can pick up the changes as describ
 
 1. Import the AWSCore header in the application delegate.
 
-    **CocoaPods**
-    
-        #import "AWSCore.h"
-
-    **Frameworks**
-    
-        #import <AWSiOSSDKv2/AWSCore.h>
+        #import <AWSCore/AWSCore.h>
 
 1. Create a default service configuration by adding the following code snippet in the `application:didFinishLaunchingWithOptions:` application delegate method.
 
-        AWSCognitoCredentialsProvider *credentialsProvider = [AWSCognitoCredentialsProvider credentialsWithRegionType:AWSRegionUSEast1
-                                                                                                            accountId:AWSAccountID
-                                                                                                       identityPoolId:CognitoPoolID
-                                                                                                        unauthRoleArn:CognitoRoleUnauth
-                                                                                                          authRoleArn:nil];
-        AWSServiceConfiguration *configuration = [AWSServiceConfiguration configurationWithRegion:AWSRegionUSEast1
-                                                                              credentialsProvider:credentialsProvider];
-        [AWSServiceManager defaultServiceManager].defaultServiceConfiguration = configuration;
+        AWSCognitoCredentialsProvider *credentialsProvider = [[AWSCognitoCredentialsProvider alloc] initWithRegionType:CognitoRegionType
+                                                                                                        identityPoolId:CognitoIdentityPoolId];
+        AWSServiceConfiguration *configuration = [[AWSServiceConfiguration alloc] initWithRegion:DefaultServiceRegionType
+                                                                             credentialsProvider:credentialsProvider];
+        AWSServiceManager.defaultServiceManager.defaultServiceConfiguration = configuration;
 
-1. Import service headers where you want to use the services. The header file import convention for CocoaPods is `#import "SERVICENAME.h"`, and for frameworks it is `#import <FRAMEWORKNAME/SERVICENAME.h>`, as in the following examples:
+1. Import the appropriate headers for the services you are using. The header file import convention is `#import <AWSServiceName/AWSServiceName.h>`, as in the following examples:
 
-    **CocoaPods**
-    
-        #import "S3.h"
-        #import "DynamoDB.h"
-        #import "SQS.h"
-        #import "SNS.h"
-
-    **Frameworks**
-    
-        #import <AWSiOSSDKv2/S3.h>
-        #import <AWSiOSSDKv2/DynamoDB.h>
-        #import <AWSiOSSDKv2/SQS.h>
-        #import <AWSiOSSDKv2/SNS.h>
+        #import <AWSCore/AWSCore.h>
+        #import <AWSS3/AWSS3.h>
+        #import <AWSDynamoDB/AWSDynamoDB.h>
+        #import <AWSSQS/AWSSQS.h>
+        #import <AWSSNS/AWSSNS.h>
+        #import <AWSCognito/AWSCognito.h>
 
 1. Make a call to the AWS services.
 
-		AWSS3Transfermanager *transferManager = [AWSS3Transfermanager defaultS3TransferManager];
+		AWSS3TransferManager *transferManager = [AWSS3Transfermanager defaultS3TransferManager];
 		AWSS3TransferManagerUploadRequest *uploadRequest = [AWSS3TransferManagerUploadRequest new];
 	    uploadRequest.bucket = yourBucket;
 	    uploadRequest.key = yourKey;

@@ -1,16 +1,16 @@
-/*
- * Copyright 2010-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License").
- * You may not use this file except in compliance with the License.
- * A copy of the License is located at
- *
- *  http://aws.amazon.com/apache2.0
- *
- * or in the "license" file accompanying this file. This file is distributed
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied. See the License for the specific language governing
- * permissions and limitations under the License.
+/**
+ Copyright 2010-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+ Licensed under the Apache License, Version 2.0 (the "License").
+ You may not use this file except in compliance with the License.
+ A copy of the License is located at
+
+ http://aws.amazon.com/apache2.0
+
+ or in the "license" file accompanying this file. This file is distributed
+ on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ express or implied. See the License for the specific language governing
+ permissions and limitations under the License.
  */
 
 #import "AWSCategory.h"
@@ -142,6 +142,46 @@ static NSTimeInterval _clockskew = 0.0;
 
 @end
 
+@implementation NSJSONSerialization (AWS)
+
++ (NSData *)aws_dataWithJSONObject:(id)obj
+                           options:(NSJSONWritingOptions)opt
+                             error:(NSError **)error {
+    if (!obj) {
+        return nil;
+    }
+    if ([NSJSONSerialization isValidJSONObject:obj]) {
+        return [NSJSONSerialization dataWithJSONObject:obj
+                                               options:opt
+                                                 error:error];
+    } else {
+        NSData *JSONData = [NSJSONSerialization dataWithJSONObject:@[obj]
+                                                           options:opt
+                                                             error:error];
+        NSString *JSONString = [[NSString alloc] initWithData:JSONData
+                                                     encoding:NSUTF8StringEncoding];
+        if ([JSONString length] > 2) {
+            JSONString = [JSONString substringWithRange:NSMakeRange(1, [JSONString length] - 2)];
+            return [JSONString dataUsingEncoding:NSUTF8StringEncoding];
+        } else {
+            return nil;
+        }
+    }
+}
+
+@end
+
+@implementation NSNumber (AWS)
+
++ (NSNumber *)aws_numberFromString:(NSString *)string {
+    NSNumberFormatter *numberFormatter = [NSNumberFormatter new];
+    numberFormatter.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+
+    return [numberFormatter numberFromString:string];
+}
+
+@end
+
 @implementation NSObject (AWS)
 
 - (NSDictionary *)aws_properties {
@@ -242,16 +282,6 @@ static NSTimeInterval _clockskew = 0.0;
 
 @implementation NSString (AWS)
 
-+ (NSString *)aws_randomStringWithLength:(NSUInteger)length {
-    NSMutableString *randomString = [NSMutableString new];
-    for (int32_t i = 0; i < length; i++) {
-        @autoreleasepool {
-            [randomString appendString:[NSString stringWithFormat:@"%c", arc4random_uniform(26) + 'a']];
-        }
-    }
-    return randomString;
-}
-
 - (BOOL)aws_isBase64Data {
     if ([self length] % 4 == 0) {
         static NSCharacterSet *invertedBase64CharacterSet = nil;
@@ -275,6 +305,14 @@ static NSTimeInterval _clockskew = 0.0;
 - (NSString *)aws_stringWithURLEncodingPath {
     return (NSString *)CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
                                                                                  (__bridge CFStringRef)[self aws_decodeURLEncoding],
+                                                                                 NULL,
+                                                                                 (CFStringRef)@"!*'\();:@&=+$,?%#[] ",
+                                                                                 kCFStringEncodingUTF8));
+}
+
+- (NSString *)aws_stringWithURLEncodingPathWithoutPriorDecoding {
+    return (NSString *)CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
+                                                                                 (__bridge CFStringRef)self,
                                                                                  NULL,
                                                                                  (CFStringRef)@"!*'\();:@&=+$,?%#[] ",
                                                                                  kCFStringEncodingUTF8));

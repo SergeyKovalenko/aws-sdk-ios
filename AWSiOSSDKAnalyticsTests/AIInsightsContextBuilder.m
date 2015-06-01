@@ -1,24 +1,25 @@
-/*
- * Copyright 2010-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License").
- * You may not use this file except in compliance with the License.
- * A copy of the License is located at
- *
- *  http://aws.amazon.com/apache2.0
- *
- * or in the "license" file accompanying this file. This file is distributed
- * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied. See the License for the specific language governing
- * permissions and limitations under the License.
+/**
+ Copyright 2010-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+ Licensed under the Apache License, Version 2.0 (the "License").
+ You may not use this file except in compliance with the License.
+ A copy of the License is located at
+
+ http://aws.amazon.com/apache2.0
+
+ or in the "license" file accompanying this file. This file is distributed
+ on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ express or implied. See the License for the specific language governing
+ permissions and limitations under the License.
  */
 
 #import "AIInsightsContextBuilder.h"
 #import "AWSMobileAnalyticsContext.h"
 #import "AWSMobileAnalyticsSDKInfo.h"
-#import "AWSMobileAnalyticsClientContext.h"
+#import "AWSClientContext.h"
 
 @interface AIInsightsContextBuilder()
+
 @property(nonatomic) NSString* appKey;
 @property(nonatomic) NSString* privateKey;
 @property(nonatomic) NSString * credentials;
@@ -41,7 +42,8 @@
 @property(nonatomic) id<AWSMobileAnalyticsFileManager> fileManager;
 @property(nonatomic) id<AWSMobileAnalyticsConnectivity> connectivity;
 @property(nonatomic) id<AWSMobileAnalyticsLifeCycleManager> lifeCycleManager;
-@property(nonatomic) id<AWSMobileAnalyticsClientContext> clientContext;
+@property(nonatomic) AWSClientContext *clientContext;
+
 @end
 
 @implementation AIInsightsContextBuilder
@@ -92,19 +94,19 @@
         mockCredentials = self.appKey;
     }
     
-    id clientContext = self.clientContext;
+    AWSClientContext *clientContext = self.clientContext;
     if(clientContext == nil) {
-        clientContext = [OCMockObject niceMockForProtocol:@protocol(AWSMobileAnalyticsClientContext)];
-        [[[clientContext stub] andReturn:self.appVersion] appVersion];
-        [[[clientContext stub] andReturn:self.appBuild] appBuild];
-        [[[clientContext stub] andReturn:self.appPackageName] appPackageName];
-        [[[clientContext stub] andReturn:self.appName] appName];
-        [[[clientContext stub] andReturn:self.manufacturer] deviceManufacturer];
-        [[[clientContext stub] andReturn:self.platform] devicePlatform];
-        [[[clientContext stub] andReturn:self.platformVersion] devicePlatformVersion];
-        [[[clientContext stub] andReturn:@"1.XX"] deviceModelVersion];
-        [[[clientContext stub] andReturn:self.model] deviceModel];
-        [[[clientContext stub] andReturn:self.locale] deviceLocale];
+        clientContext = [AWSClientContext new];
+        clientContext.appVersion = self.appVersion;
+        clientContext.appBuild = self.appBuild;
+        clientContext.appPackageName = self.appPackageName;
+        clientContext.appName = self.appName;
+        clientContext.deviceManufacturer = self.manufacturer;
+        clientContext.devicePlatform = self.platform;
+        clientContext.devicePlatformVersion = self.platformVersion;
+        clientContext.deviceModelVersion = @"1.XX";
+        clientContext.deviceModel = self.model;
+        clientContext.deviceLocale = self.locale;
     }
 
     id mockSDKInfo = [OCMockObject niceMockForClass:[AWSMobileAnalyticsSDKInfo class]];
